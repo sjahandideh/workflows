@@ -1,10 +1,6 @@
 require 'workflows/version'
 require 'workflows/step'
 
-# TODO: remove me
-require 'pry'
-require 'pry-byebug'
-
 module Workflows
 
   def self.included(base)

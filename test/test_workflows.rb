@@ -24,11 +24,26 @@ describe Workflows do
 
   describe ".run" do
     it "raises MissingRunMethod execption when a service doesn't have a run method" do
+      BarbieMakerFlow::Design.class_eval { if method_defined?(:run); undef :run; end }
+
       proc { @flow.run }.
         must_raise Workflows::Step::MissingRunMethodError
     end
 
     it "returns success when all steps run successfully" do
+      BarbieMakerFlow::Design.class_eval { def run; :success; end }
+      BarbieMakerFlow::Make.class_eval { def run; :success; end }
+
+      flow = BarbieMakerFlow.new
+      flow.run.must_equal [:success, :success]
+    end
+
+    it "returns success when all steps run successfully" do
+      BarbieMakerFlow::Design.class_eval { def run; :fail; end }
+      BarbieMakerFlow::Make.class_eval { def run; :fail; end }
+
+      flow = BarbieMakerFlow.new
+      flow.run.must_equal [:fail, :fail]
     end
   end
 end
