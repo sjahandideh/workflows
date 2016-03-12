@@ -1,5 +1,7 @@
 require "workflows/version"
 
 module Workflows
-  # Your code goes here...
+  def self.greet(name)
+    "Hey #{name}"
+  end
 end
