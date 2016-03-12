@@ -14,11 +14,10 @@ class BarbieMakerFlow
 end
 
 describe Workflows do
-  before { @flow = BarbieMakerFlow.new }
 
   describe ".has_flow" do
     it "has a flow" do
-      @flow.steps.size.must_equal 2
+      BarbieMakerFlow.new.steps.size.must_equal 2
     end
   end
 
@@ -26,7 +25,7 @@ describe Workflows do
     it "raises MissingRunMethod execption when a service doesn't have a run method" do
       BarbieMakerFlow::Design.class_eval { if method_defined?(:run); undef :run; end }
 
-      proc { @flow.run }.
+      proc { BarbieMakerFlow.new.run }.
         must_raise Workflows::Step::MissingRunMethodError
     end
 
