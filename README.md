@@ -1,8 +1,14 @@
 # Workflows
 
-Welcome to your new gem! In this directory, you'll find the files you need to be able to package up your Ruby library into a gem. Put your Ruby code in the file `lib/workflows`. To experiment with that code, run `bin/console` for an interactive prompt.
-
-TODO: Delete this and the text above, and describe your gem
+Workflows is an attempt to create multiple-step services. each step of
+the workflow is service by itself that has a run method. it can fail or
+succeed and the status of the step will change to :fail or :ok
+respectively. each service in this model has two types of output. one
+that is called state and another that is called output. state will be
+passed to the next step of the workflow, so if there are objects that
+need to be passed between the steps, they should be kept in state.
+outputs are not passed between the steps and are only holding the output
+value of each executed step of the workflow.
 
 ## Installation
 
