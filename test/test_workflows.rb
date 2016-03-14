@@ -24,14 +24,9 @@ class BarbieMakerFlow
     include Workflows::StepService
 
     def run
-      state = {
-        barbie: Barbie.new(*barbie_args)
-      }
-      set_state(state) # always the last command
-    end
-
-    def barbie_args
-      ['female', 'Software Engineer']
+      set_state(
+        barbie: Barbie.new(args.gender, args.specification)
+      )
     end
   end
 
@@ -40,39 +35,50 @@ class BarbieMakerFlow
 
     def run
       barbie = get_state[:barbie]
-      msg = barbie.dress_up(outfit)
+      msg = barbie.dress_up(args.outfit)
 
       set_output(msg)
       set_state(barbie: barbie)
-    end
-
-    def outfit
-      'white shirt and navy shorts'
     end
   end
 
   has_flow [
     {
-      name: 'one',
-      service: Design
+      name: 'design',
+      service: Design,
+      args: [:gender, :specification]
     },
     {
-      name: 'two',
-      service: Make
+      name: 'make',
+      service: Make,
+      args: [:outfit]
     }
   ]
+
 end
 
 describe Workflows do
-  it "this." do
+  before do
+    ### setup
     barbie = BarbieMakerFlow::Barbie.new 'female', 'Software Engineer'
     BarbieMakerFlow::Barbie.stub(:new, 'female', 'Software Engineer') { barbie }
 
-    bmf = BarbieMakerFlow.new
-    bmf.run.must_equal "female Software Engineer barbie is wearing a white shirt and navy shorts"
-#    bmf.state.must_be_kind_of BarbieMakerFlow::Barbie
+    ### subject
+    @bmf = BarbieMakerFlow.new(
+      design: { gender: 'female', specification: 'Software Engineer' },
+      make: { outfit: 'white shirt and navy shorts' }
+    )
+  end
 
-    engineer_barbie = bmf.state[:barbie]
+  it "output is correct" do
+    @bmf.run.
+      must_equal "female Software Engineer barbie is wearing a white shirt and navy shorts"
+  end
+
+  it "state is correct" do
+    @bmf.run
+    engineer_barbie = @bmf.state[:barbie]
+    engineer_barbie.must_be_kind_of BarbieMakerFlow::Barbie
     engineer_barbie.gender.must_equal 'female'
     engineer_barbie.specification.must_equal 'Software Engineer'
     engineer_barbie.outfit.must_equal 'white shirt and navy shorts'

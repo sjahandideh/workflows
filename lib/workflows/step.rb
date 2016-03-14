@@ -1,11 +1,18 @@
-require 'pry'
-require 'pry-byebug'
+require 'ostruct'
 
 module Workflows
   module StepService
     ####
     # Getter, Setter methods
     ####
+
+    def set_args(args)
+      @wf_args ||= OpenStruct.new(args)
+    end
+
+    def args
+      @wf_args
+    end
 
     def set_state(state)
       @wf_state = state
@@ -36,12 +43,14 @@ module Workflows
     attr_reader :service_obj,
                 :status,
                 :output,
-                :state
+                :state,
+                :name
 
     def initialize(args = {})
       @name = args[:name]
       @klass = args[:service]
       @strategy = args[:strategy] || :fail
+      @service_args = args[:args]
 
       @service_obj = @klass.new
     end
@@ -55,6 +64,10 @@ module Workflows
       @output = e.message
     ensure
       @state = service_obj.get_state
+    end
+
+    def set_args(args)
+      service_obj.set_args args
     end
 
     def set_state(state)

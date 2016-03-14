@@ -24,7 +24,17 @@ module Workflows
   # instance methods
   ####
 
-  def run
+  def initialize(service_args = {})
+    # TODO: validate service_args
+    # make sure there is one for each service
+    # according to the wf structure defined with has_flow
+    wf_steps.each do |wf_step|
+      args = service_args.fetch(wf_step.name.to_sym)
+      wf_step.set_args args
+    end
+  end
+
+  def run(args = {})
     previous_state = {}
     wf_steps.each do |wf_step|
       wf_step.set_state(previous_state)
