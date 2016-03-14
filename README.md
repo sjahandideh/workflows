@@ -20,9 +20,85 @@ Or install it yourself as:
 
     $ gem install workflows
 
-## Usage
+## Example
 
-TODO: Write usage instructions here
+You can find more examples in the example directory of the gem.
+
+If you have a workflow such as the following:
+
+```ruby
+class BarbieMakerFlow
+  include Workflows
+
+
+  has_flow [
+    {
+      name: 'design',
+      service: Design,
+      args: [:gender, :specification]
+    },
+    {
+      name: 'make',
+      service: Make,
+      args: [:outfit]
+    }
+  ]
+
+end
+
+class Design
+  include Workflows::StepService
+
+  def run
+    set_state(
+      barbie: Barbie.new(args.gender, args.specification)
+    )
+  end
+end
+
+class Make
+  include Workflows::StepService
+
+  def run
+    barbie = get_state[:barbie]
+    msg = barbie.dress_up(args.outfit)
+
+    set_output(msg)
+    set_state(barbie: barbie)
+  end
+end
+
+class Barbie
+  attr_reader :gender,
+              :specification,
+              :outfit
+
+  def initialize(gender, specification)
+    @gender = gender
+    @specification = specification
+  end
+
+  def dress_up(outfit)
+    @outfit = outfit
+    "#{@gender} #{@specification} barbie is wearing a #{outfit}"
+  end
+end
+```
+
+you can now run your flow by providing input arguments for each step:
+
+```ruby
+bmf = BarbieMakerFlow.new(
+  design: { gender: 'female', specification: 'Software Engineer' },
+  make: { outfit: 'white shirt and navy shorts' }
+)
+
+bmf.run  #=> runs the flow with provided inputs
+bmf.status #=> [:ok, :ok] | [:ok, :fail] | [:fail, :fail]
+bmf.output #=> ['output of design', 'output of make']
+bmf.state #=> Barbie.new(gender: 'female',
+specification: ....)
+```
 
 ## Development
 
