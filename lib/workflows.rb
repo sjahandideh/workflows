@@ -1,8 +1,5 @@
-require 'workflows/version'
-require 'workflows/step'
-
-require 'pry'
-require 'pry-byebug'
+require_relative 'workflows/version'
+require_relative 'workflows/step'
 
 module Workflows
 
@@ -47,5 +44,13 @@ module Workflows
 
   def state
     wf_steps.last.get_state
+  end
+
+  def status
+    wf_steps.map { |wf_step| wf_step.status }
+  end
+
+  def output
+    wf_steps.map { |wf_step| wf_step.output }
   end
 end
